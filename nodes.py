@@ -75,15 +75,57 @@ class NAIpromptList:
             v = kwargs[k]
 
             # Only process string input ports.
-            if isinstance(v, str) and v != '':
-                prompts.append(v)
+            # if isinstance(v, str) and v != '':
+            #     prompts.append(v)
+            prompts.append(v)
 
         return (prompts, prompts)
+#promptList NAIv4preの仕様によりマックス6で設定
+class NAIcharaPositions:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"optional": {
+            "Position":("BOOLEAN",{"default": False, "label_on": "ON", "label_off": "OFF"}, ),
+            "Position_1_x": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_1_y": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_2_x": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_2_y": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_3_x": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_3_y": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_4_x": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_4_y": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_5_x": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_5_y": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_6_x": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
+            "Position_6_y": ("INT", {"default": 5,"min": 1, "max": 9, "step": 2,}),
 
+
+        },
+            # "optional": {
+            #     "optional_prompt_list": ("LIST",)
+            # }
+        }
+
+    RETURN_TYPES = ("BOOLEAN", "LIST")
+    # RETURN_NAMES = ("prompt_list", "prompt_strings")
+    # OUTPUT_IS_LIST = (False, True)
+    FUNCTION = "run"
+    CATEGORY = "jisaku"
+
+    def run(self,Position,Position_1_x,Position_1_y,Position_2_x,Position_2_y,Position_3_x,Position_3_y,Position_4_x,Position_4_y,Position_5_x,Position_5_y,Position_6_x,Position_6_y):
+        if Position:
+                
+            charp = [Position_1_x/10,Position_1_y/10],[Position_2_x/10,Position_2_y/10],[Position_3_x/10,Position_3_y/10],[Position_4_x/10,Position_4_y/10],[Position_5_x/10,Position_5_y/10],[Position_6_x/10,Position_6_y/10]
+
+        else:
+            charp = [[0.5,0.5],[0.5,0.5],[0.5,0.5],[0.5,0.5],[0.5,0.5],[0.5,0.5]]
+
+        return (Position, charp)
 NODE_CLASS_MAPPINGS = {
     # "bbbbb": aaaaa,
     "DelayNode": DelayNode,
     "NAIpromptList":NAIpromptList,
+    "NAIPositions":NAIcharaPositions,
 
 }
 
@@ -91,5 +133,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     # "bbbbb": "ccccc",
     "DelayNode":"DelayNode",
     "NAIpromptList":"NAIキャラプロンプトリスト",
+    "NAIPositions":"NAIキャラポジション"
 }
 

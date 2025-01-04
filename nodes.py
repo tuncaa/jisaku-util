@@ -1,23 +1,5 @@
 import time
-
-# class aaaaa:
-#     @classmethod
-#     def INPUT_TYPES(s):
-#         return {"required":
-#                     {
-#                         "myINT": ("INT",{"forceInput": False,"default":10}),
-#                         "anything" : ("*", {}),
-
-#                     }
-#                 }
-
-#     RETURN_TYPES = ("INT",)
-#     FUNCTION = "go"
-#     CATEGORY = "test"
-
-#     def go(self, myINT):
-#         time.sleep(10)
-#         return myINT
+import json
 
 class DelayNode:
     @classmethod
@@ -121,11 +103,71 @@ class NAIcharaPositions:
             charp = [[0.5,0.5],[0.5,0.5],[0.5,0.5],[0.5,0.5],[0.5,0.5],[0.5,0.5]]
 
         return (Position, charp)
+
+
+# NAIのPostdadaを分解してEagleへ送信するデータにする
+class NAIPostdataToString:
+    @classmethod
+    def INPUT_TYPES(s):
+        return {"required":
+                    {
+                        "PostJsondata": ("STRING",{"forceInput": False,}),
+                    }
+
+        },
+
+    RETURN_TYPES = ("STRING","STRING","STRING",)
+    RETURN_NAMES = ("Positive", "Negative","Setting")
+    # OUTPUT_IS_LIST = (False, True)
+    FUNCTION = "run"
+    CATEGORY = "jisaku"
+
+    def run(self,PostJsondata):
+
+        data = json.loads(PostJsondata)
+         # 必要な項目を取得
+        base_positive = data.get("input", "N/A")
+        model_value = data.get("model", "N/A")
+        parameters = data.get("parameters", {})
+        
+        # parameters内の特定の値を取得
+        width = parameters.get("width", "N/A")
+        height = parameters.get("height", "N/A")
+        steps = parameters.get("steps", "N/A")
+        seed = parameters.get("seed", "N/A")
+        base_negative = parameters.get("negative_prompt", "N/A")
+        
+        # characterPromptsを取得
+        character_prompts = parameters.get("characterPrompts", [])
+        character_prompts_str = ''
+        if parameters.get('use_coords','N/A') == True:
+            for i, char_prompt in enumerate(character_prompts, 1):
+                prompt = char_prompt.get("prompt", "N/A")
+                uc = char_prompt.get("uc", "N/A")
+                center = char_prompt.get("center", {})
+                x = center.get("x", "N/A")
+                y = center.get("y", "N/A")
+                character_prompts_str = character_prompts_str + f'Chara{i} Pos: {prompt} UC: {uc} Center: ({x},{y})'
+        else:
+            for i, char_prompt in enumerate(character_prompts, 1):
+                prompt = char_prompt.get("prompt", "N/A")
+                uc = char_prompt.get("uc", "N/A")
+                character_prompts_str = character_prompts_str + f'Chara{i} Pos: {prompt} UC: {uc} Center:None'
+
+        settings =f'''
+        Model:{model_value} size:{width}x{height} Steps:{steps} Seed:{seed} {character_prompts_str}
+        '''
+
+
+        return(base_positive,base_negative,settings,)
+
+
 NODE_CLASS_MAPPINGS = {
     # "bbbbb": aaaaa,
     "DelayNode": DelayNode,
     "NAIpromptList":NAIpromptList,
     "NAIPositions":NAIcharaPositions,
+    "NAIPostdata2string":NAIPostdataToString,
 
 }
 
@@ -133,6 +175,6 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     # "bbbbb": "ccccc",
     "DelayNode":"DelayNode",
     "NAIpromptList":"NAIキャラプロンプトリスト",
-    "NAIPositions":"NAIキャラポジション"
+    "NAIPositions":"NAIキャラポジション",
+    "NAIPostdata2string":"NAIPostData分解",
 }
-

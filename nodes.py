@@ -114,7 +114,7 @@ class NAIPostdataToString:
                         "PostJsondata": ("STRING",{"forceInput": False,}),
                     }
 
-        },
+        }
 
     RETURN_TYPES = ("STRING","STRING","STRING",)
     RETURN_NAMES = ("Positive", "Negative","Setting")
@@ -135,8 +135,20 @@ class NAIPostdataToString:
         height = parameters.get("height", "N/A")
         steps = parameters.get("steps", "N/A")
         seed = parameters.get("seed", "N/A")
+        scale = parameters.get("scale","N/A")
         base_negative = parameters.get("negative_prompt", "N/A")
-        
+        # CFG関係のオプションが設定されている場合取得
+        optional_settings =''
+        dynamic_thresholding = parameters.get("","N/A") #基本false
+        cfg_rescale = parameters.get("cfg_rescale", 0) #基本0
+        skip_cfg_above_sigma = parameters.get("skip_cfg_above_sigma",0) #基本0
+        if dynamic_thresholding == True:
+            optional_settings = optional_settings + "dynamic_thresholding:True "
+        if cfg_rescale != 0:
+            optional_settings = optional_settings + f"cfg_rescale: {cfg_rescale} "
+        if skip_cfg_above_sigma != 0:
+            optional_settings = optional_settings + f"skip_cfg_above_sigma: {skip_cfg_above_sigma} "
+
         # characterPromptsを取得
         character_prompts = parameters.get("characterPrompts", [])
         character_prompts_str = ''
@@ -147,28 +159,25 @@ class NAIPostdataToString:
                 center = char_prompt.get("center", {})
                 x = center.get("x", "N/A")
                 y = center.get("y", "N/A")
-                character_prompts_str = character_prompts_str + f'Chara{i} Pos: {prompt} UC: {uc} Center: ({x},{y})'
+                character_prompts_str = character_prompts_str + f'\nChara{i} Pos: {prompt} UC: {uc} Center: ({x},{y})'
         else:
             for i, char_prompt in enumerate(character_prompts, 1):
                 prompt = char_prompt.get("prompt", "N/A")
                 uc = char_prompt.get("uc", "N/A")
-                character_prompts_str = character_prompts_str + f'Chara{i} Pos: {prompt} UC: {uc} Center:None'
+                character_prompts_str = character_prompts_str + f'\nChara{i} Pos: {prompt} UC: {uc} Center:None'
 
-        settings =f'''
-        Model:{model_value} size:{width}x{height} Steps:{steps} Seed:{seed} {character_prompts_str}
-        '''
+        settings =f'Model:{model_value} size:{width}x{height} Steps:{steps} CFG:{scale} Seed:{seed}\n{optional_settings}\n{character_prompts_str}'
 
 
         return(base_positive,base_negative,settings,)
 
 
 NODE_CLASS_MAPPINGS = {
-    # "bbbbb": aaaaa,
+    #aaaaaはclass名 "bbbbb": aaaaa,
     "DelayNode": DelayNode,
     "NAIpromptList":NAIpromptList,
     "NAIPositions":NAIcharaPositions,
     "NAIPostdata2string":NAIPostdataToString,
-
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

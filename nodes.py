@@ -173,6 +173,28 @@ class NAIPostdataToString:
 
         return(base_positive,base_negative,settings,)
 
+class textSwitchfix:
+    # ComfyUI-Easy-Use textSwitch を修正（個人用）
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "input": ("INT", {"default": 1, "min": 1, "max": 4}),
+            },
+            "optional": {
+                "tlist": ("LIST", {"forceInput": True}),
+            }
+        }
+
+    RETURN_TYPES = ("STRING",)
+    RETURN_NAMES = ("STRING",)
+    CATEGORY = "jisaku"
+    FUNCTION = "switch"
+
+    def switch(self, input, tlist=[""],):
+        return (tlist[input-1],)
+
+
 
 NODE_CLASS_MAPPINGS = {
     #aaaaaはclass名 "bbbbb": aaaaa,
@@ -180,6 +202,7 @@ NODE_CLASS_MAPPINGS = {
     "NAIpromptList":NAIpromptList,
     "NAIPositions":NAIcharaPositions,
     "NAIPostdata2string":NAIPostdataToString,
+    "List2text":textSwitchfix,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -188,4 +211,5 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "NAIpromptList":"NAIキャラプロンプトリスト",
     "NAIPositions":"NAIキャラポジション",
     "NAIPostdata2string":"NAIPostData分解",
+    "List2text":"list2text",
 }

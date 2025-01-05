@@ -137,6 +137,8 @@ class NAIPostdataToString:
         seed = parameters.get("seed", "N/A")
         scale = parameters.get("scale","N/A")
         base_negative = parameters.get("negative_prompt", "N/A")
+        sampler = parameters.get("sampler","N/A")
+        noise_schedule = parameters.get("noise_schedule","N/A")
         # CFG関係のオプションが設定されている場合取得
         optional_settings =''
         dynamic_thresholding = parameters.get("","N/A") #基本false
@@ -166,7 +168,7 @@ class NAIPostdataToString:
                 uc = char_prompt.get("uc", "N/A")
                 character_prompts_str = character_prompts_str + f'\nChara{i} Pos: {prompt} UC: {uc} Center:None'
 
-        settings =f'Model:{model_value} size:{width}x{height} Steps:{steps} CFG:{scale} Seed:{seed}\n{optional_settings}\n{character_prompts_str}'
+        settings =f'Model:{model_value} size:{width}x{height} Steps:{steps} CFG:{scale} Seed:{seed} sampler:{sampler} {noise_schedule}\n{optional_settings}\n{character_prompts_str}'
 
 
         return(base_positive,base_negative,settings,)
